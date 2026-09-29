@@ -13,6 +13,7 @@ import (
 var (
 	sessionTokenPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{1,36}$`)
 	placeIDPattern      = regexp.MustCompile(`^[A-Za-z0-9_-]{1,200}$`)
+	countryCodePattern  = regexp.MustCompile(`^[A-Za-z]{2}$`)
 )
 
 func ParseAutocompleteParams(query url.Values) (models.AutocompleteParams, error) {
@@ -44,6 +45,26 @@ func ParsePlaceDetailsParams(placeID string, query url.Values) (models.PlaceDeta
 	}
 
 	return models.PlaceDetailsParams{PlaceID: placeID, SessionToken: sessionToken}, nil
+}
+
+func ParseEventSearchParams(query url.Values) (models.EventSearchParams, error) {
+	city := strings.ToLower(strings.TrimSpace(query.Get("city")))
+	countryCode := strings.ToUpper(strings.TrimSpace(query.Get("countryCode")))
+	category := strings.ToLower(strings.TrimSpace(query.Get("category")))
+
+	if city == "" ||
+		len(city) > models.MaxCityBytes ||
+		!utf8.ValidString(city) ||
+		hasControlChars(city) ||
+		!countryCodePattern.MatchString(countryCode) ||
+		(category != models.CategoryMusic && category != models.CategorySports) {
+		return models.EventSearchParams{}, models.APIError{
+			StatusCode: http.StatusBadRequest,
+			Message:    models.MsgInvalidEventSearch,
+		}
+	}
+
+	return models.EventSearchParams{City: city, CountryCode: countryCode, Category: category}, nil
 }
 
 func hasControlChars(s string) bool {
