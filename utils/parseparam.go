@@ -10,7 +10,10 @@ import (
 	"unicode/utf8"
 )
 
-var sessionTokenPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{1,36}$`)
+var (
+	sessionTokenPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{1,36}$`)
+	placeIDPattern      = regexp.MustCompile(`^[A-Za-z0-9_-]{1,200}$`)
+)
 
 func ParseAutocompleteParams(query url.Values) (models.AutocompleteParams, error) {
 	sessionToken := strings.TrimSpace(query.Get("sessionToken"))
@@ -28,6 +31,19 @@ func ParseAutocompleteParams(query url.Values) (models.AutocompleteParams, error
 	}
 
 	return models.AutocompleteParams{Input: input, SessionToken: sessionToken}, nil
+}
+
+func ParsePlaceDetailsParams(placeID string, query url.Values) (models.PlaceDetailsParams, error) {
+	sessionToken := strings.TrimSpace(query.Get("sessionToken"))
+
+	if !placeIDPattern.MatchString(placeID) || !sessionTokenPattern.MatchString(sessionToken) {
+		return models.PlaceDetailsParams{}, models.APIError{
+			StatusCode: http.StatusBadRequest,
+			Message:    models.MsgInvalidPlace,
+		}
+	}
+
+	return models.PlaceDetailsParams{PlaceID: placeID, SessionToken: sessionToken}, nil
 }
 
 func hasControlChars(s string) bool {

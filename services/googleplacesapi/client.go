@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"event-explorer/models"
@@ -18,6 +20,7 @@ const (
 	defaultBaseURL   = "https://places.googleapis.com"
 	defaultTimeout   = 5 * time.Second
 	autocompletePath = "/v1/places:autocomplete"
+	placesPath       = "/v1/places/"
 	userAgent        = "event-explorer/1.0"
 )
 
@@ -91,6 +94,68 @@ func (c *Client) Autocomplete(ctx context.Context, params models.AutocompletePar
 	return models.AutocompleteResponse{Suggestions: suggestions}, nil
 }
 
+func (c *Client) PlaceDetails(ctx context.Context, params models.PlaceDetailsParams) (models.City, error) {
+	query := url.Values{"sessionToken": {params.SessionToken}}
+	endpoint := c.BaseURL + placesPath + url.PathEscape(params.PlaceID) + "?" + query.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		return models.City{}, err
+	}
+
+	req.Header.Set("X-Goog-FieldMask", "addressComponents")
+
+	res, err := c.send(req)
+	if err != nil {
+		return models.City{}, err
+	}
+	defer func() {
+		if err := res.Body.Close(); err != nil {
+			logs.Warn("failed to close response body: %v", err)
+		}
+	}()
+
+	if res.StatusCode == http.StatusNotFound || res.StatusCode == http.StatusBadRequest {
+		return models.City{}, cityNotFound(
+			fmt.Errorf("google places api returned %s", res.Status),
+		)
+	}
+
+	var result placeResponse
+	if err := readJSON(res, &result); err != nil {
+		return models.City{}, err
+	}
+
+	var city, postalTown, level3, country string
+
+	for _, comp := range result.AddressComponents {
+		for _, t := range comp.Types {
+			switch t {
+			case "locality":
+				city = comp.LongText
+			case "postal_town":
+				postalTown = comp.LongText
+			case "administrative_area_level_3":
+				level3 = comp.LongText
+			case "country":
+				country = strings.ToUpper(comp.ShortText)
+			}
+		}
+	}
+
+	for _, fallback := range []string{postalTown, level3} {
+		if city == "" {
+			city = fallback
+		}
+	}
+
+	if city == "" || len(country) != 2 {
+		return models.City{}, cityNotFound(errors.New("place has no city or country code"))
+	}
+
+	return models.City{City: city, CountryCode: country}, nil
+}
+
 func (c *Client) send(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Goog-Api-Key", c.APIKey)
@@ -124,6 +189,14 @@ func providerError(err error) models.APIError {
 	return models.APIError{
 		StatusCode: http.StatusBadGateway,
 		Message:    MsgProviderFailed,
+		Err:        err,
+	}
+}
+
+func cityNotFound(err error) models.APIError {
+	return models.APIError{
+		StatusCode: http.StatusNotFound,
+		Message:    MsgCityNotFound,
 		Err:        err,
 	}
 }

@@ -18,3 +18,7 @@ func NewLocationService(client *googleplacesapi.Client) *LocationService {
 func (s *LocationService) Autocomplete(ctx context.Context, params models.AutocompleteParams) (models.AutocompleteResponse, error) {
 	return s.client.Autocomplete(ctx, params)
 }
+
+func (s *LocationService) PlaceDetails(ctx context.Context, params models.PlaceDetailsParams) (models.City, error) {
+	return s.client.PlaceDetails(ctx, params)
+}

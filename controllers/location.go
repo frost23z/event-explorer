@@ -36,6 +36,31 @@ func (l *LocationController) Autocomplete() {
 	l.RespondJSON(http.StatusOK, result)
 }
 
+// @Title Resolve selected city
+// @Description Turns a suggestion's placeId into the city and two-letter countryCode used to build the /events URL.
+// @Param placeId path string true "placeId returned by /api/locations/autocomplete"
+// @Param sessionToken query string true "Same session token used while typing"
+// @Success 200 {object} models.City
+// @Success 400 {object} models.ErrorResponse
+// @Success 404 {object} models.ErrorResponse
+// @Success 502 {object} models.ErrorResponse
+// @router /:placeId [get]
+func (l *LocationController) Details() {
+	params, err := utils.ParsePlaceDetailsParams(l.Ctx.Input.Param(":placeId"), l.Ctx.Request.URL.Query())
+	if err != nil {
+		l.RespondError(err)
+		return
+	}
+
+	result, err := locationService.PlaceDetails(l.Ctx.Request.Context(), params)
+	if err != nil {
+		l.RespondError(err)
+		return
+	}
+
+	l.RespondJSON(http.StatusOK, result)
+}
+
 func SetLocationService(s *services.LocationService) {
 	locationService = s
 }

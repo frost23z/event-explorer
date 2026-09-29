@@ -18,3 +18,6 @@ linters:
 formatters:
   enable:
     - goimports
+  exclusions:
+    paths:
+      - routers/commentsRouter.go
