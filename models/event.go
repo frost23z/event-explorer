@@ -7,6 +7,7 @@ const (
 	MaxCityBytes = 100
 
 	MsgInvalidEventSearch = "Use a city, a two-letter country code and either Music or Sports."
+	MsgInvalidEvent       = "Use a valid event."
 )
 
 type EventSearchParams struct {

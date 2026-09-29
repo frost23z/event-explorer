@@ -76,6 +76,35 @@ func (c *Client) Events(ctx context.Context, params models.EventSearchParams) ([
 	return events, nil
 }
 
+// Event returns one event, including its ticket URL.
+func (c *Client) Event(ctx context.Context, eventID string) (models.Event, error) {
+	res, err := c.get(ctx, "/events/"+url.PathEscape(eventID)+".json", nil)
+	if err != nil {
+		return models.Event{}, err
+	}
+	defer func() {
+		if err := res.Body.Close(); err != nil {
+			logs.Warn("failed to close response body: %v", err)
+		}
+	}()
+
+	// Ticketmaster answers 404 for an unknown event and 400 for a malformed ID.
+	if res.StatusCode == http.StatusNotFound || res.StatusCode == http.StatusBadRequest {
+		return models.Event{}, eventNotFound(fmt.Errorf("ticketmaster api returned %s", res.Status))
+	}
+
+	var payload eventPayload
+	if err := readJSON(res, &payload); err != nil {
+		return models.Event{}, err
+	}
+
+	if payload.ID == "" || payload.Name == "" {
+		return models.Event{}, eventNotFound(errors.New("event has no id or name"))
+	}
+
+	return payload.toEvent(), nil
+}
+
 func (p eventPayload) toEvent() models.Event {
 	event := models.Event{
 		ID:          p.ID,
@@ -186,6 +215,14 @@ func providerError(err error) models.APIError {
 	return models.APIError{
 		StatusCode: http.StatusBadGateway,
 		Message:    MsgProviderFailed,
+		Err:        err,
+	}
+}
+
+func eventNotFound(err error) models.APIError {
+	return models.APIError{
+		StatusCode: http.StatusNotFound,
+		Message:    MsgEventNotFound,
 		Err:        err,
 	}
 }

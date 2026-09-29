@@ -14,6 +14,7 @@ var (
 	sessionTokenPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{1,36}$`)
 	placeIDPattern      = regexp.MustCompile(`^[A-Za-z0-9_-]{1,200}$`)
 	countryCodePattern  = regexp.MustCompile(`^[A-Za-z]{2}$`)
+	eventIDPattern      = regexp.MustCompile(`^[A-Za-z0-9_-]{1,64}$`)
 )
 
 func ParseAutocompleteParams(query url.Values) (models.AutocompleteParams, error) {
@@ -65,6 +66,17 @@ func ParseEventSearchParams(query url.Values) (models.EventSearchParams, error) 
 	}
 
 	return models.EventSearchParams{City: city, CountryCode: countryCode, Category: category}, nil
+}
+
+func ParseEventID(eventID string) (string, error) {
+	if !eventIDPattern.MatchString(eventID) {
+		return "", models.APIError{
+			StatusCode: http.StatusBadRequest,
+			Message:    models.MsgInvalidEvent,
+		}
+	}
+
+	return eventID, nil
 }
 
 func hasControlChars(s string) bool {

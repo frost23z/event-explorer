@@ -18,3 +18,7 @@ func NewEventService(client *ticketmasterapi.Client) *EventService {
 func (s *EventService) Events(ctx context.Context, params models.EventSearchParams) ([]models.Event, error) {
 	return s.client.Events(ctx, params)
 }
+
+func (s *EventService) Event(ctx context.Context, eventID string) (models.Event, error) {
+	return s.client.Event(ctx, eventID)
+}
