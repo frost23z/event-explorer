@@ -4,7 +4,10 @@ go 1.26.6
 
 require github.com/beego/beego/v2 v2.3.10
 
-require github.com/smartystreets/goconvey v1.6.4
+require (
+	github.com/joho/godotenv v1.5.1
+	github.com/smartystreets/goconvey v1.6.4
+)
 
 require (
 	4d63.com/gocheckcompilerdirectives v1.4.0 // indirect
