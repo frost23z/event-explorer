@@ -19,5 +19,10 @@ func main() {
 		logs.Critical("GOOGLE_PLACES_API_KEY is not set")
 		os.Exit(1)
 	}
+
+	if beego.BConfig.RunMode == "dev" {
+		beego.BConfig.WebConfig.DirectoryIndex = true
+		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
+	}
 	beego.Run()
 }
