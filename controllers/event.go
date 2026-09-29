@@ -1,10 +1,13 @@
 package controllers
 
 import (
-	"event-explorer/utils"
+	"net/http"
 
-	"github.com/beego/beego/v2/core/logs"
+	"event-explorer/services"
+	"event-explorer/utils"
 )
+
+var eventService *services.EventService
 
 type EventController struct {
 	BaseController
@@ -26,5 +29,15 @@ func (e *EventController) List() {
 		return
 	}
 
-	logs.Info("%v", params)
+	result, err := eventService.Events(e.Ctx.Request.Context(), params)
+	if err != nil {
+		e.RespondError(err)
+		return
+	}
+
+	e.RespondJSON(http.StatusOK, result)
+}
+
+func SetEventService(s *services.EventService) {
+	eventService = s
 }

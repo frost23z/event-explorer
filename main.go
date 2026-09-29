@@ -7,6 +7,7 @@ import (
 	_ "event-explorer/routers"
 	"event-explorer/services"
 	"event-explorer/services/googleplacesapi"
+	"event-explorer/services/ticketmasterapi"
 
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
@@ -18,16 +19,25 @@ func main() {
 		logs.Info("No .env file found, using system environment variables")
 	}
 
-	if apiKey := os.Getenv("GOOGLE_PLACES_API_KEY"); apiKey == "" {
-		logs.Critical("GOOGLE_PLACES_API_KEY is not set")
-		os.Exit(1)
-	} else {
-		controllers.SetLocationService(services.NewLocationService(googleplacesapi.NewClient(apiKey)))
-	}
+	googleKey := requireEnv("GOOGLE_PLACES_API_KEY")
+	ticketmasterKey := requireEnv("TICKETMASTER_API_KEY")
+
+	controllers.SetLocationService(services.NewLocationService(googleplacesapi.NewClient(googleKey)))
+	controllers.SetEventService(services.NewEventService(ticketmasterapi.NewClient(ticketmasterKey)))
 
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
 	beego.Run()
+}
+
+func requireEnv(name string) string {
+	value := os.Getenv(name)
+	if value == "" {
+		logs.Critical("%s is not set", name)
+		os.Exit(1)
+	}
+
+	return value
 }
