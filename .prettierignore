@@ -1,0 +1,25 @@
+# dependencies
+node_modules
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+package-lock.json
+pnpm-lock.yaml
+
+# testing
+coverage
+
+# Ignore artifacts:
+build
+coverage
+.next
+out
+
+# Go files
+**/*.go
+go.sum
+go.mod

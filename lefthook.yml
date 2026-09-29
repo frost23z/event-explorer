@@ -2,7 +2,7 @@ pre-commit:
   piped: true
   commands:
     format:
-      run: go tool golangci-lint fmt {staged_files}
+      run: go tool golangci-lint fmt {staged_files} && pnpm format --write {staged_files}
       stage_fixed: true
     lint:
       run: go tool golangci-lint run ./...
