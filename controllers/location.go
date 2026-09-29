@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"event-explorer/services"
 	"event-explorer/utils"
-
-	"github.com/beego/beego/v2/core/logs"
+	"net/http"
 )
+
+var locationService *services.LocationService
 
 type LocationController struct {
 	BaseController
@@ -25,5 +27,15 @@ func (l *LocationController) Autocomplete() {
 		return
 	}
 
-	logs.Info("%v", params)
+	result, err := locationService.Autocomplete(l.Ctx.Request.Context(), params)
+	if err != nil {
+		l.RespondError(err)
+		return
+	}
+
+	l.RespondJSON(http.StatusOK, result)
+}
+
+func SetLocationService(s *services.LocationService) {
+	locationService = s
 }
