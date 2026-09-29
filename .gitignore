@@ -1,0 +1,55 @@
+# If you prefer the allow list template instead of the deny list, see:
+# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build output
+dist/
+bin/
+tmp/
+*.bin
+event-explorer
+event-explorer.exe
+
+# Test binary, built with `go test -c`
+*.test
+
+# Go profiling/debugging
+*.pprof
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Beego-specific logs and generated files
+logs/
+*.log
+swagger/
+routers/commentsRouter.go
+
+# Dependency directories
+vendor/
+
+# Go workspace files
+go.work
+go.work.sum
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor/IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
