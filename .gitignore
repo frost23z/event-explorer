@@ -8,11 +8,14 @@
 *.so
 *.dylib
 
-# Build output
-dist/
+# Build output and dependency directories
+dist
+dist-ssr
 bin/
 tmp/
 *.bin
+node_modules
+*.local
 event-explorer
 event-explorer.exe
 
@@ -29,10 +32,11 @@ coverage.*
 profile.cov
 
 # Beego-specific logs and generated files
-logs/
-*.log
 swagger/
 routers/commentsRouter.go
+static/css/main.css
+static/js/main.js
+# TODO : Must be removed and committed to the repo before submission
 
 # Dependency directories
 vendor/
@@ -46,10 +50,23 @@ go.work.sum
 .env.*
 !.env.example
 
-# Editor/IDE
-.idea/
-.vscode/
-
-# OS
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
 Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
