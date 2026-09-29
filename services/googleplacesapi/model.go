@@ -1,8 +1,10 @@
 package googleplacesapi
 
-const MaxAutocompleteSuggestions = 5
-const MsgProviderFailed = "Unable to retrieve places. Please try again."
-const MsgCityNotFound = "City not found."
+const (
+	MsgProviderFailed          = "Unable to retrieve places. Please try again."
+	MsgCityNotFound            = "City not found."
+	MaxAutocompleteSuggestions = 5
+)
 
 type autocompleteRequest struct {
 	Input                string   `json:"input"`

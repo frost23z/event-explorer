@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"unicode/utf8"
 
 	"event-explorer/models"
 	"event-explorer/services/googleplacesapi"
@@ -16,6 +17,9 @@ func NewLocationService(client *googleplacesapi.Client) *LocationService {
 }
 
 func (s *LocationService) Autocomplete(ctx context.Context, params models.AutocompleteParams) (models.AutocompleteResponse, error) {
+	if utf8.RuneCountInString(params.Input) < models.MinAutocompleteRunes {
+		return models.AutocompleteResponse{Suggestions: []models.Suggestion{}}, nil
+	}
 	return s.client.Autocomplete(ctx, params)
 }
 
