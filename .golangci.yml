@@ -1,0 +1,20 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - contextcheck
+    - errname
+    - errorlint
+    - forcetypeassert
+    - gosec
+    - nilerr
+    - nilnil
+    - noctx
+    - unconvert
+    - usestdlibvars
+
+formatters:
+  enable:
+    - goimports

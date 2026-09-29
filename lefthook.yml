@@ -1,0 +1,15 @@
+pre-commit:
+  piped: true
+  commands:
+    format:
+      run: go tool golangci-lint fmt {staged_files}
+      stage_fixed: true
+    lint:
+      run: go tool golangci-lint run ./...
+      stage_fixed: true
+
+pre-push:
+  piped: true
+  commands:
+    test:
+      run: go test ./...
