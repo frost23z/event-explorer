@@ -1,3 +1,19 @@
 @import 'tailwindcss';
 
 @source '../../views/**/*.tpl';
+
+@theme {
+    --color-canvas: #fafbf8;
+    --color-ink: #12302b;
+    --color-muted: #5b6b66;
+    --color-line: #dee6e1;
+    --color-brand: #086b58;
+    --color-brand-dark: #065a49;
+    --color-brand-soft: #e3efe9;
+    --color-sand: #f3f6ee;
+    --color-lime: #dbeaaa;
+    --color-accent: #e8855a;
+    --color-warn-bg: #fff8f1;
+    --color-warn-line: #efd3b8;
+    --color-warn-text: #8a4b1c;
+}
