@@ -42,7 +42,6 @@ func (c *Client) Events(ctx context.Context, params models.EventSearchParams) ([
 		"classificationName": {params.Category},
 		"size":               {strconv.Itoa(EventsPageSize)},
 	}
-	logs.Info("ticketmaster query: %s", query.Encode())
 
 	res, err := c.get(ctx, "/events.json", query)
 	if err != nil {
@@ -179,7 +178,6 @@ func (c *Client) get(ctx context.Context, path string, query url.Values) (*http.
 	if err != nil {
 		return nil, errors.New("build ticketmaster request")
 	}
-	logs.Trace("ticketmaster request: %s", req.URL.String())
 
 	req.Header.Set("User-Agent", userAgent)
 
