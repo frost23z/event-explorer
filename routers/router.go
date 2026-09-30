@@ -18,5 +18,8 @@ func init() {
 		beego.NewNamespace("/events",
 			beego.NSInclude(&controllers.EventController{}),
 		),
+		beego.NewNamespace("/redirect",
+			beego.NSInclude(&controllers.RedirectController{}),
+		),
 	)
 }
