@@ -79,6 +79,25 @@ func ParseEventID(eventID string) (string, error) {
 	return eventID, nil
 }
 
+func ParseListingParams(query url.Values) (models.EventSearchParams, error) {
+	rawCity := strings.TrimSpace(query.Get("city"))
+	city := strings.ToLower(rawCity)
+	countryCode := strings.ToUpper(strings.TrimSpace(query.Get("countryCode")))
+
+	if city == "" ||
+		len(city) > models.MaxCityBytes ||
+		!utf8.ValidString(rawCity) || // before ToLower, which would replace bad bytes
+		hasControlChars(city) ||
+		!countryCodePattern.MatchString(countryCode) {
+		return models.EventSearchParams{}, models.APIError{
+			StatusCode: http.StatusBadRequest,
+			Message:    models.MsgInvalidListing,
+		}
+	}
+
+	return models.EventSearchParams{City: city, CountryCode: countryCode}, nil
+}
+
 func hasControlChars(s string) bool {
 	for _, r := range s {
 		if unicode.IsControl(r) {

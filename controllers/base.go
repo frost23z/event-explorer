@@ -30,11 +30,11 @@ func (b *BaseController) RespondJSON(status int, v any) {
 	}
 }
 
-func (b *BaseController) RespondError(err error) {
+func (b *BaseController) apiError(err error) (models.APIError, bool) {
 	if errors.Is(err, context.Canceled) {
 		logs.Debug("%s %s canceled by client", b.Ctx.Request.Method, b.Ctx.Request.URL.Path)
 		b.Ctx.Output.SetStatus(statusClientClosedRequest)
-		return
+		return models.APIError{}, false
 	}
 
 	apiErr := models.AsAPIError(err)
@@ -49,8 +49,38 @@ func (b *BaseController) RespondError(err error) {
 		)
 	}
 
+	return apiErr, true
+}
+
+// RespondError answers JSON routes.
+func (b *BaseController) RespondError(err error) {
+	apiErr, ok := b.apiError(err)
+	if !ok {
+		return
+	}
+
 	b.RespondJSON(
 		apiErr.StatusCode,
 		models.ErrorResponse{Error: apiErr.Message},
 	)
+}
+
+// RenderError answers page routes with the HTML error page.
+func (b *BaseController) RenderError(err error) {
+	apiErr, ok := b.apiError(err)
+	if !ok {
+		return
+	}
+
+	b.Ctx.Output.SetStatus(apiErr.StatusCode)
+	b.Data["Title"] = "Error"
+	b.Data["Status"] = apiErr.StatusCode
+	b.Data["Message"] = apiErr.Message
+	b.Layout = "layout.tpl"
+	b.TplName = "error.tpl"
+
+	// Render now so the status set above is kept.
+	if renderErr := b.Render(); renderErr != nil {
+		logs.Error("%s %s failed to render error page: %v", b.Ctx.Request.Method, b.Ctx.Request.URL.Path, renderErr)
+	}
 }

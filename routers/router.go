@@ -8,17 +8,15 @@ import (
 
 func init() {
 	beego.Router("/", &controllers.HomeController{})
-	ns := beego.NewNamespace("/api",
-		beego.NSNamespace("/locations",
-			beego.NSInclude(
-				&controllers.LocationController{},
+
+	beego.AddNamespace(
+		beego.NewNamespace("/api",
+			beego.NSNamespace("/locations",
+				beego.NSInclude(&controllers.LocationController{}),
 			),
 		),
-		beego.NSNamespace("/events",
-			beego.NSInclude(
-				&controllers.EventController{},
-			),
+		beego.NewNamespace("/events",
+			beego.NSInclude(&controllers.EventController{}),
 		),
 	)
-	beego.AddNamespace(ns)
 }

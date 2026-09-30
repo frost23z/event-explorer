@@ -8,6 +8,7 @@ const (
 
 	MsgInvalidEventSearch = "Use a city, a two-letter country code and either Music or Sports."
 	MsgInvalidEvent       = "Use a valid event."
+	MsgInvalidListing     = "Use a city and a two-letter country code."
 )
 
 type EventSearchParams struct {
@@ -27,4 +28,9 @@ type Event struct {
 	City        string `json:"city"`
 	Description string `json:"description"`
 	TicketURL   string `json:"ticketUrl"`
+}
+
+type CategoryResult struct {
+	Events []Event
+	Err    error
 }
