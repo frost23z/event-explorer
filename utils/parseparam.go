@@ -48,37 +48,9 @@ func ParsePlaceDetailsParams(placeID string, query url.Values) (models.PlaceDeta
 	return models.PlaceDetailsParams{PlaceID: placeID, SessionToken: sessionToken}, nil
 }
 
-func ParseEventSearchParams(query url.Values) (models.EventSearchParams, error) {
-	city := strings.ToLower(strings.TrimSpace(query.Get("city")))
-	countryCode := strings.ToUpper(strings.TrimSpace(query.Get("countryCode")))
-	category := strings.ToLower(strings.TrimSpace(query.Get("category")))
-
-	if city == "" ||
-		len(city) > models.MaxCityBytes ||
-		!utf8.ValidString(city) ||
-		hasControlChars(city) ||
-		!countryCodePattern.MatchString(countryCode) ||
-		(category != models.CategoryMusic && category != models.CategorySports) {
-		return models.EventSearchParams{}, models.APIError{
-			StatusCode: http.StatusBadRequest,
-			Message:    models.MsgInvalidEventSearch,
-		}
-	}
-
-	return models.EventSearchParams{City: city, CountryCode: countryCode, Category: category}, nil
-}
-
-func ParseEventID(eventID string) (string, error) {
-	if !eventIDPattern.MatchString(eventID) {
-		return "", models.APIError{
-			StatusCode: http.StatusBadRequest,
-			Message:    models.MsgInvalidEvent,
-		}
-	}
-
-	return eventID, nil
-}
-
+// ParseListingParams reads the city and countryCode of the /events page. The
+// city is returned lowercase (it is part of the cache key); the category is
+// left empty because the page shows both categories.
 func ParseListingParams(query url.Values) (models.EventSearchParams, error) {
 	rawCity := strings.TrimSpace(query.Get("city"))
 	city := strings.ToLower(rawCity)
@@ -96,6 +68,17 @@ func ParseListingParams(query url.Values) (models.EventSearchParams, error) {
 	}
 
 	return models.EventSearchParams{City: city, CountryCode: countryCode}, nil
+}
+
+func ParseEventID(eventID string) (string, error) {
+	if !eventIDPattern.MatchString(eventID) {
+		return "", models.APIError{
+			StatusCode: http.StatusBadRequest,
+			Message:    models.MsgInvalidEvent,
+		}
+	}
+
+	return eventID, nil
 }
 
 func hasControlChars(s string) bool {

@@ -68,6 +68,32 @@ func (p *EventController) Listing() {
 	p.TplName = "listing.tpl"
 }
 
+// @router /:eventId [get]
+func (p *EventController) Details() {
+	eventID, err := utils.ParseEventID(p.Ctx.Input.Param(":eventId"))
+	if err != nil {
+		p.RenderError(err)
+		return
+	}
+
+	event, err := eventService.Event(p.Ctx.Request.Context(), eventID)
+	if err != nil {
+		p.RenderError(err)
+		return
+	}
+
+	// Back goes to the listing the visitor came from, or to the home page
+	// for a direct link with no (valid) city.
+	city, link, fromListing := listingLink(p.Ctx.Request.URL.Query())
+
+	p.Data["Title"] = event.Name
+	p.Data["Event"] = event
+	p.Data["City"] = city
+	p.Data["BackURL"] = link
+	p.Data["FromListing"] = fromListing
+	p.TplName = "details.tpl"
+}
+
 func SetEventService(s *services.EventService) {
 	eventService = s
 }
