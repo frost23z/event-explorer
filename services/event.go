@@ -9,17 +9,28 @@ import (
 
 type EventService struct {
 	client *ticketmasterapi.Client
+	cache  *eventCache
 }
 
 func NewEventService(client *ticketmasterapi.Client) *EventService {
-	return &EventService{client: client}
+	return &EventService{client: client, cache: newEventCache()}
 }
 
+// Events returns the cached list when there is a fresh one. Only successful
+// lists are cached, so a failure is retried on the next request.
 func (s *EventService) Events(ctx context.Context, params models.EventSearchParams) ([]models.Event, error) {
+	key := cacheKey(params)
+
+	if events, ok := s.cache.get(key); ok {
+		return events, nil
+	}
+
 	events, err := s.client.Events(ctx, params)
 	if err != nil {
 		return nil, err
 	}
+
+	s.cache.set(key, events)
 
 	return events, nil
 }
