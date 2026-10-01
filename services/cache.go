@@ -59,3 +59,16 @@ func (c *eventCache) set(key string, events []models.Event) {
 
 	c.entries[key] = cacheEntry{events: events, expiresAt: c.now().Add(cacheTTL)}
 }
+
+// clear drops every entry and returns how many there were.
+func (c *eventCache) clear() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	removed := len(c.entries)
+	c.entries = map[string]cacheEntry{}
+
+	logs.Info("cache cleared: %d entries removed", removed)
+
+	return removed
+}

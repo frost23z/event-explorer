@@ -32,5 +32,10 @@ type Event struct {
 
 type CategoryResult struct {
 	Events []Event
+	Cached bool
 	Err    error
+}
+
+type CacheClearResponse struct {
+	Cleared int `json:"cleared"`
 }

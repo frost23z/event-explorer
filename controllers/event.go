@@ -57,6 +57,10 @@ func (p *EventController) Listing() {
 
 	music, sports := eventService.MusicAndSports(p.Ctx.Request.Context(), params.City, params.CountryCode)
 
+	// Lets anyone check cache reuse without reading the logs.
+	p.Ctx.Output.Header("X-Music-Cache", cacheStatus(music))
+	p.Ctx.Output.Header("X-Sports-Cache", cacheStatus(sports))
+
 	p.Data["Title"] = "Events in " + city
 	p.Data["City"] = city
 	p.Data["CountryCode"] = params.CountryCode
@@ -96,6 +100,16 @@ func (p *EventController) Details() {
 
 func SetEventService(s *services.EventService) {
 	eventService = s
+}
+
+// cacheStatus is HIT when the section came from the cache. A failed section
+// never did, so it is a MISS.
+func cacheStatus(result models.CategoryResult) string {
+	if result.Cached {
+		return "HIT"
+	}
+
+	return "MISS"
 }
 
 func newSection(title, kind, tagline string, result models.CategoryResult) section {
