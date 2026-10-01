@@ -71,7 +71,7 @@ func ValidateTicketURL(raw string) (string, error) {
 
 func ticketUnavailable(err error) models.APIError {
 	return models.APIError{
-		StatusCode: http.StatusBadGateway,
+		StatusCode: http.StatusBadRequest,
 		Message:    models.MsgTicketUnavailable,
 		Err:        err,
 	}

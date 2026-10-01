@@ -4,7 +4,7 @@ const (
 	CategoryMusic  = "music"
 	CategorySports = "sports"
 
-	MaxCityBytes = 100
+	MaxCityRunes = 80
 
 	MsgInvalidEvent      = "Use a valid event."
 	MsgInvalidListing    = "Use a city and a two-letter country code."

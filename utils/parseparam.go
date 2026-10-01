@@ -57,7 +57,7 @@ func ParseListingParams(query url.Values) (models.EventSearchParams, error) {
 	countryCode := strings.ToUpper(strings.TrimSpace(query.Get("countryCode")))
 
 	if city == "" ||
-		len(city) > models.MaxCityBytes ||
+		utf8.RuneCountInString(city) > models.MaxCityRunes ||
 		!utf8.ValidString(rawCity) || // before ToLower, which would replace bad bytes
 		hasControlChars(city) ||
 		!countryCodePattern.MatchString(countryCode) {

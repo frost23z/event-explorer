@@ -95,7 +95,7 @@ func (c *Client) Autocomplete(ctx context.Context, params models.AutocompletePar
 }
 
 func (c *Client) PlaceDetails(ctx context.Context, params models.PlaceDetailsParams) (models.City, error) {
-	query := url.Values{"sessionToken": {params.SessionToken}}
+	query := url.Values{"sessionToken": {params.SessionToken}, "languageCode": {"en"}}
 	endpoint := c.BaseURL + placesPath + url.PathEscape(params.PlaceID) + "?" + query.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
