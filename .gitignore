@@ -33,10 +33,6 @@ profile.cov
 
 # Beego-specific logs and generated files
 swagger/
-routers/commentsRouter.go
-static/css/main.css
-static/js/main.js
-# TODO : Must be removed and committed to the repo before submission
 
 # Dependency directories
 vendor/
