@@ -8,8 +8,6 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/beego/beego/v2/core/logs"
-
 	_ "event-explorer/routers"
 
 	beego "github.com/beego/beego/v2/server/web"
@@ -22,15 +20,13 @@ func init() {
 	beego.TestBeegoInit(apppath)
 }
 
-// TestBeego is a sample to run an endpoint test
-func TestBeego(t *testing.T) {
+// TestHomePageRenders checks that the home page is served.
+func TestHomePageRenders(t *testing.T) {
 	r, _ := http.NewRequestWithContext(context.TODO(), http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 	beego.BeeApp.Handlers.ServeHTTP(w, r)
 
-	logs.Trace("testing", "TestBeego", "Code[%d]\n%s", w.Code, w.Body.String())
-
-	Convey("Subject: Test Station Endpoint\n", t, func() {
+	Convey("Subject: Home page\n", t, func() {
 		Convey("Status Code Should Be 200", func() {
 			So(w.Code, ShouldEqual, 200)
 		})
